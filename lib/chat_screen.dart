@@ -14,12 +14,11 @@ class ChatScreen extends StatelessWidget {
 
     try {
       await FirebaseFirestore.instance
-          .collection('couples')
+          .collection('Chats')
           .doc(coupleId)
           .collection('messages')
           .add({
         'text': messageText,
-        'sender': 'Partner',
         'timestamp': FieldValue.serverTimestamp(),
       });
     } catch (e) {
@@ -39,7 +38,7 @@ class ChatScreen extends StatelessWidget {
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('couples')
+                  .collection('Chats')
                   .doc(coupleId)
                   .collection('messages')
                   .orderBy('timestamp', descending: true)
