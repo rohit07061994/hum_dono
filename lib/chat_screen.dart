@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
-  final String chatId;
-  const ChatScreen({super.key, required this.chatId});
+  final String coupleId;
+  const ChatScreen({super.key, required this.coupleId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat Room ($chatId)'),
+        title: Text('Chat Room ($coupleId)'),
         backgroundColor: Colors.pink,
       ),
       body: Column(
