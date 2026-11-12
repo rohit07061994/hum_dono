@@ -19,12 +19,15 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6'
+          flutter-version: '3.19.4'
           channel: 'stable'
           cache: true
 
       - name: Install Dependencies
         run: flutter pub get
+
+      - name: Create Android Project Structure
+        run: flutter create . --platforms=android
 
       - name: Accept Android Licenses
         run: yes | flutter doctor --android-licenses
