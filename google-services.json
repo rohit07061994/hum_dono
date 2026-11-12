@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "758466439078",
+    "project_id": "hum-dono-2451a",
+    "storage_bucket": "hum-dono-2451a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758466439078:android:08ad8d95998000ce389167",
+        "android_client_info": {
+          "package_name": "Humdono.cim"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAi9is9XnwFoVwIN1nKUGwFDH1wdS2-oNQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
