@@ -23,7 +23,6 @@ class HumDonoApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.pink,
       ),
-      // Yahan seedha ChatScreen load hoga test_id ke sath
       home: ChatScreen(coupleId: 'test_id'),
     );
   }
