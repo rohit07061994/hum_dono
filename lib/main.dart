@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Intimacy & Games'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Intimacy & Tasks'),
           BottomNavigationBarItem(icon: Icon(Icons.lock), label: 'Secrets'),
         ],
       ),
@@ -137,11 +137,16 @@ class _ChatTabState extends State<ChatTab> {
   }
 }
 
-// 2. Intimacy & Games Tab (With Positions & Ideas)
-class GamesTab extends StatelessWidget {
+// 2. Intimacy & Custom Tasks Tab
+class GamesTab extends StatefulWidget {
   const GamesTab({super.key});
 
-  final List> intimacyItems = const [
+  @override
+  State<GamesTab> createState() => _GamesTabState();
+}
+
+class _GamesTabState extends State<GamesTab> {
+  final List> intimacyItems = [
     {
       'title': '🔥 Missionary / Face-to-Face',
       'desc': 'Sabse classic aur emotional connection banane wali position, jisme eye contact aur closeness sabse zyada hoti hai.'
@@ -164,39 +169,97 @@ class GamesTab extends StatelessWidget {
     }
   ];
 
+  void _showAddTaskDialog() {
+    final titleController = TextEditingController();
+    final descController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Naya Task / Position Add Karein'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(hintText: 'Task ya Position ka naam...'),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: descController,
+              decoration: const InputDecoration(hintText: 'Task ki detail Hindi mein likhein...'),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+            onPressed: () {
+              if (titleController.text.trim().isNotEmpty && descController.text.trim().isNotEmpty) {
+                setState(() {
+                  intimacyItems.insert(0, {
+                    'title': '🔥 ${titleController.text.trim()}',
+                    'desc': descController.text.trim(),
+                  });
+                });
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Add Karein', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        const Text(
-          '🔥 Intimacy & Positions Ideas',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.pink),
-        ),
-        const SizedBox(height: 12),
-        ...intimacyItems.map((item) => Card(
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item['title']!,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.pinkAccent),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  item['desc']!,
-                  style: const TextStyle(fontSize: 15, color: Colors.black87),
-                ),
-              ],
-            ),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showAddTaskDialog,
+        backgroundColor: Colors.pink,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('Naya Task', style: TextStyle(color: Colors.white)),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const Text(
+            '🔥 Intimacy & Custom Tasks',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.pink),
           ),
-        )),
-      ],
+          const SizedBox(height: 12),
+          ...intimacyItems.map((item) => Card(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            elevation: 2,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item['title']!,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.pinkAccent),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    item['desc']!,
+                    style: const TextStyle(fontSize: 15, color: Colors.black87),
+                  ),
+                ],
+              ),
+            ),
+          )),
+          const SizedBox(height: 60),
+        ],
+      ),
     );
   }
 }
