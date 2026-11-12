@@ -4,7 +4,11 @@ import 'chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    print("Firebase init error: $e");
+  }
   runApp(const HumDonoApp());
 }
 
@@ -19,7 +23,7 @@ class HumDonoApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.pink,
       ),
-      home: ChatScreen(coupleId: 'test_id'),
+      home: ChatScreen(chatId: 'test_id'),
     );
   }
 }
