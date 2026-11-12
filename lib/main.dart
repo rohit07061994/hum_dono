@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'chat_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  await Firebase.initializeApp();
+  runApp(const HumDonoApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class HumDonoApp extends StatelessWidget {
+  const HumDonoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Hum Dono',
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Hum Dono Test')),
-        body: const Center(
-          child: Text(
-            'App Chal Gayi!',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-        ),
+      theme: ThemeData(
+        primarySwatch: Colors.pink,
       ),
+      home: ChatScreen(coupleId: 'test_id'),
     );
   }
 }
