@@ -56,7 +56,8 @@ class TestHomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ChatScreen(coupleId: 'test_id'),
+                    // Yahan se 'const' hata diya gaya hai
+                    builder: (context) => ChatScreen(coupleId: 'test_id'),
                   ),
                 );
               },
