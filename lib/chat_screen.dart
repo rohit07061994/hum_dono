@@ -1,24 +1,89 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatScreen extends StatelessWidget {
   final String coupleId;
-  const ChatScreen({super.key, required this.coupleId});
+  ChatScreen({super.key, required this.coupleId});
+
+  final TextEditingController _controller = TextEditingController();
+
+  void _sendMessage() async {
+    if (_controller.text.trim().isEmpty) return;
+    String messageText = _controller.text.trim();
+    _controller.clear();
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('couples')
+          .doc(coupleId)
+          .collection('messages')
+          .add({
+        'text': messageText,
+        'sender': 'Partner',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      debugPrint("Error sending message: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat Room ($coupleId)'),
+        title: Text('Hum Dono ($coupleId)'),
         backgroundColor: Colors.pink,
       ),
       body: Column(
         children: [
-          const Expanded(
-            child: Center(
-              child: Text(
-                'Chat Screen Loaded Successfully!',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('couples')
+                  .doc(coupleId)
+                  .collection('messages')
+                  .orderBy('timestamp', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Center(child: Text('Kuch error aa gayi hai!'));
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final docs = snapshot.data?.docs ?? [];
+
+                if (docs.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'Abhi koi message nahi hai.\nPehla message bhejiye!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  reverse: true,
+                  itemCount: docs.length,
+                  itemBuilder: (context, index) {
+                    final data = docs[index].data() as Map<String, dynamic>;
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.pink.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        data['text'] ?? '',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ),
           Container(
@@ -26,10 +91,11 @@ class ChatScreen extends StatelessWidget {
             color: Colors.white,
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Type a message...',
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      hintText: 'Apna message likhein...',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -37,7 +103,7 @@ class ChatScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.send, color: Colors.pink),
-                  onPressed: () {},
+                  onPressed: _sendMessage,
                 ),
               ],
             ),
