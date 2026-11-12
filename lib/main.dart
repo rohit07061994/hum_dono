@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +53,12 @@ class TestHomeScreen extends StatelessWidget {
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
               onPressed: () {
-                // Yahan se aap apne ChatScreen par ja sakte hain
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ChatScreen(chatId: 'test_id'),
+                  ),
+                );
               },
               child: const Text('Open Chat', style: TextStyle(color: Colors.white)),
             ),
