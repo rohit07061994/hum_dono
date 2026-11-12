@@ -15,9 +15,8 @@ class HumDonoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.pink,
-        scaffoldBackgroundColor: const Color(0xFFFCE4EC),
       ),
-      home: const ChatScreen(),
+      home: const ChatScreen(coupleId: 'test_id'),
     );
   }
 }
