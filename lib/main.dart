@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Positions'),
-          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'Truth/Dare'),
+          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'T/Dare'),
           BottomNavigationBarItem(icon: Icon(Icons.mood), label: 'Mood'),
           BottomNavigationBarItem(icon: Icon(Icons.rate_review), label: 'Maza'),
         ],
@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// 1. Baatcheet (Chat) Tab
+// 1. Chat Tab
 class ChatTab extends StatefulWidget {
   const ChatTab({super.key});
 
@@ -155,7 +155,7 @@ class _ChatTabState extends State<ChatTab> {
   }
 }
 
-// 2. Positions & Custom Tasks Tab
+// 2. Positions Tab
 class GamesTab extends StatefulWidget {
   const GamesTab({super.key});
 
@@ -164,19 +164,16 @@ class GamesTab extends StatefulWidget {
 }
 
 class _GamesTabState extends State<GamesTab> {
-  final List> intimacyItems = [
-    {
-      'title': '👫 Face-to-Face (Aamne-Samne)',
-      'desc': 'Tarika: Ek-dusre ke aamne-samne let kar pyaar karna. Isme aankhon mein dekh kar closeness sabse zyada maza deti hai.'
-    },
-    {
-      'title': '🫂 Spooning (Piche se Gale Lagna)',
-      'desc': 'Tarika: Ek hi disha mein karwat lekar letna. Bahut aaramdayak aur romantic style hai.'
-    },
-    {
-      'title': '👑 Upper Control (Upar Rehna)',
-      'desc': 'Tarika: Poora control apne haath mein rakhne aur apni marzi se speed adjust karne ki best position.'
-    },
+  final List<String> titles = [
+    '👫 Face-to-Face (Aamne-Samne)',
+    '🫂 Spooning (Piche se Gale Lagna)',
+    '👑 Upper Control (Upar Rehna)'
+  ];
+
+  final List<String> descs = [
+    'Tarika: Ek-dusre ke aamne-samne let kar pyaar karna. Isme aankhon mein dekh kar closeness sabse zyada maza deti hai.',
+    'Tarika: Ek hi disha mein karwat lekar letna. Bahut aaramdayak aur romantic style hai.',
+    'Tarika: Poora control apne haath mein rakhne aur apni marzi se speed adjust karne ki best position.'
   ];
 
   void _showAddTaskDialog() {
@@ -215,10 +212,8 @@ class _GamesTabState extends State<GamesTab> {
             onPressed: () {
               if (titleController.text.trim().isNotEmpty && descController.text.trim().isNotEmpty) {
                 setState(() {
-                  intimacyItems.insert(0, {
-                    'title': '🔥 ${titleController.text.trim()}',
-                    'desc': descController.text.trim(),
-                  });
+                  titles.insert(0, '🔥 ${titleController.text.trim()}');
+                  descs.insert(0, descController.text.trim());
                 });
                 Navigator.pop(context);
               }
@@ -240,15 +235,21 @@ class _GamesTabState extends State<GamesTab> {
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text('Naya Task Jodein', style: TextStyle(color: Colors.white)),
       ),
-      body: ListView(
+      body: ListView.builder(
         padding: const EdgeInsets.all(16),
-        children: [
-          const Text(
-            '🔥 Intimacy Positions & Tasks (Hindi)',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.pinkAccent),
-          ),
-          const SizedBox(height: 12),
-          ...intimacyItems.map((item) => Card(
+        itemCount: titles.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return const Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: Text(
+                '🔥 Intimacy Positions & Tasks (Hindi)',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.pinkAccent),
+              ),
+            );
+          }
+          int i = index - 1;
+          return Card(
             color: const Color(0xFF381229),
             margin: const EdgeInsets.symmetric(vertical: 8),
             elevation: 4,
@@ -258,21 +259,20 @@ class _GamesTabState extends State<GamesTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item['title']!, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.pinkAccent)),
+                  Text(titles[i], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.pinkAccent)),
                   const SizedBox(height: 8),
-                  Text(item['desc']!, style: const TextStyle(fontSize: 15, color: Colors.white70)),
+                  Text(descs[i], style: const TextStyle(fontSize: 15, color: Colors.white70)),
                 ],
               ),
             ),
-          )),
-          const SizedBox(height: 60),
-        ],
+          );
+        },
       ),
     );
   }
 }
 
-// 3. Private Truth or Dare Tab (Bold & Clear Hindi)
+// 3. Truth or Dare Tab
 class TruthOrDareTab extends StatefulWidget {
   const TruthOrDareTab({super.key});
 
@@ -295,7 +295,7 @@ class _TruthOrDareTabState extends State<TruthOrDareTab> {
     'Himmat Karo: Partner ke kaan mein apni sabse gandi aur romantic khwahish seedhe shabdo mein bolo.'
   ];
 
-  String currentQuestion = 'Neeche diye gaye button par click karke Sach ya Himmat chunें!';
+  String currentQuestion = 'Neeche diye gaye button par click karke Sach ya Himmat chunein!';
   String typeTitle = '';
 
   void getRandomTruth() {
@@ -316,11 +316,12 @@ class _TruthOrDareTabState extends State<TruthOrDareTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const SizedBox(height: 20),
           const Text(
             '🔥 Private Truth or Dare 🔥',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.pinkAccent),
@@ -476,7 +477,7 @@ class _MoodTrackerTabState extends State<MoodTrackerTab> {
   }
 }
 
-// 5. Feedback Tab (Ratri ka Maza)
+// 5. Feedback Tab
 class FeedbackTab extends StatefulWidget {
   const FeedbackTab({super.key});
 
@@ -513,7 +514,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('${rating.toInt()} / 5 Star', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.amber)),
+                    Text('${rating.toInt()} / 5 Star', style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.amber)),
                   ],
                 ),
                 Slider(
