@@ -23,49 +23,8 @@ class HumDonoApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.pink,
       ),
-      home: const TestHomeScreen(),
-    );
-  }
-}
-
-class TestHomeScreen extends StatelessWidget {
-  const TestHomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Hum Dono - Connected'),
-        backgroundColor: Colors.pink,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 80),
-            const SizedBox(height: 20),
-            const Text(
-              'Firebase & Flutter Successfully Loaded!',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    // Yahan se 'const' hata diya gaya hai
-                    builder: (context) => ChatScreen(coupleId: 'test_id'),
-                  ),
-                );
-              },
-              child: const Text('Open Chat', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
+      // Yahan seedha ChatScreen load hoga test_id ke sath
+      home: ChatScreen(coupleId: 'test_id'),
     );
   }
 }
