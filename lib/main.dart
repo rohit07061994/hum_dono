@@ -56,7 +56,8 @@ class TestHomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ChatScreen(chatId: 'test_id'),
+                    // Yahan chatId ki jagah coupleId kar diya hai taaki match ho jaye
+                    builder: (context) => const ChatScreen(coupleId: 'test_id'),
                   ),
                 );
               },
