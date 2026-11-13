@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// 1. Real-time Firebase Chat Tab (Bulletproof Loading & Empty States)
+// 1. Cloud Firestore Chat Tab
 class ChatTab extends StatefulWidget {
   const ChatTab({super.key});
 
@@ -99,15 +99,21 @@ class ChatTab extends StatefulWidget {
 
 class _ChatTabState extends State<ChatTab> {
   final TextEditingController _controller = TextEditingController();
-  final DatabaseReference _chatRef = FirebaseDatabase.instance.ref().child('chats');
+  final CollectionReference _chatRef = FirebaseFirestore.instance.collection('chats');
 
-  void _sendMessage() {
+  void _sendMessage() async {
     if (_controller.text.trim().isEmpty) return;
-    _chatRef.push().set({
-      'text': _controller.text.trim(),
-      'time': DateTime.now().millisecondsSinceEpoch,
-    });
+    String textToSend = _controller.text.trim();
     _controller.clear();
+    try {
+      await _chatRef.add({
+        'text': textToSend,
+        'time': FieldValue.serverTimestamp(),
+        'localTime': DateTime.now().millisecondsSinceEpoch,
+      });
+    } catch (e) {
+      // Handle error
+    }
   }
 
   @override
@@ -115,15 +121,15 @@ class _ChatTabState extends State<ChatTab> {
     return Column(
       children: [
         Expanded(
-          child: StreamBuilder(
-            stream: _chatRef.onValue,
-            builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
+          child: StreamBuilder<QuerySnapshot>(
+            stream: _chatRef.orderBy('localTime', descending: false).snapshots(),
+            builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
                   child: CircularProgressIndicator(color: Colors.pinkAccent),
                 );
               }
-              if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(24.0),
@@ -135,44 +141,31 @@ class _ChatTabState extends State<ChatTab> {
                   ),
                 );
               }
-              try {
-                Map map = snapshot.data!.snapshot.value as Map;
-                List messages = map.values.toList();
-                messages.sort((a, b) {
-                  int timeA = (a['time'] ?? 0) is int ? a['time'] : 0;
-                  int timeB = (b['time'] ?? 0) is int ? b['time'] : 0;
-                  return timeA.compareTo(timeB);
-                });
 
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    return Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.pink[800],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          messages[index]['text'] ?? '',
-                          style: const TextStyle(fontSize: 16, color: Colors.white),
-                        ),
+              final docs = snapshot.data!.docs;
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: docs.length,
+                itemBuilder: (context, index) {
+                  final data = docs[index].data() as Map<String, dynamic>;
+                  return Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.pink[800],
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    );
-                  },
-                );
-              } catch (e) {
-                return const Center(
-                  child: Text(
-                    'Pehla message bhejein aur chat shuru karein!',
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
-                );
-              }
+                      child: Text(
+                        data['text'] ?? '',
+                        style: const TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  );
+                },
+              );
             },
           ),
         ),
@@ -259,7 +252,7 @@ class GamesTab extends StatelessWidget {
   }
 }
 
-// 3. Truth or Dare Tab (100 Truth & 100 Dares Updated)
+// 3. Truth or Dare Tab (Poori Spicy List ke sath)
 class TruthOrDareTab extends StatefulWidget {
   const TruthOrDareTab({super.key});
 
@@ -451,7 +444,7 @@ class _TruthOrDareTabState extends State<TruthOrDareTab> {
     "Partner ke kan ke lobe ko apne daanton se halka sa kaat kar wahan garam saansein chhodna.",
     "Partner ke sath 5 minute tak bina hile ek-dusre ki ankhon mein dekh kar heavy breathing karna.",
     "Partner ke haath ki hatheli par apna private part touch karke unhe garam feel karwana.",
-    "Partner ke saamne ghutno par baith kar unke lund ko apne muh mein lena aur ankhon mein dekhna.",
+    "Partner ke saamne ghutno par baith kar unke lund ko muh mein lena aur ankhon mein dekhna.",
     "Partner ki chut ke lips (labia) ko apne hathon se khol kar andar ki taraf jeebh lagana.",
     "Partner ke sath room ki saari lights band karke sirf touch aur feeling ke zariye intimacy karna.",
     "Partner ke chest par apne nange boobs ko ragadte hue unhe paagal karna.",
