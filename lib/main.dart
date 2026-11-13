@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// 1. Real-time Firebase Chat Tab (Fixed Timestamp & Sync to prevent messages disappearing)
+// 1. Real-time Firebase Chat Tab (Bulletproof Loading & Empty States)
 class ChatTab extends StatefulWidget {
   const ChatTab({super.key});
 
@@ -118,40 +118,66 @@ class _ChatTabState extends State<ChatTab> {
           child: StreamBuilder(
             stream: _chatRef.onValue,
             builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
-              if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
-                return const Center(child: Text('Koi message nahi hai...', style: TextStyle(color: Colors.white54)));
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(color: Colors.pinkAccent),
+                );
               }
-              Map map = snapshot.data!.snapshot.value as Map;
-              List messages = map.values.toList();
-              messages.sort((a, b) {
-                int timeA = (a['time'] ?? 0) is int ? a['time'] : 0;
-                int timeB = (b['time'] ?? 0) is int ? b['time'] : 0;
-                return timeA.compareTo(timeB);
-              });
-
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: messages.length,
-                itemBuilder: (context, index) {
-                  return Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.pink[800],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(messages[index]['text'] ?? '', style: const TextStyle(fontSize: 16, color: Colors.white)),
+              if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: Text(
+                      '💕 Yahan apni sweet baatein shuru karein! Pehla message bhejein.',
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                      textAlign: TextAlign.center,
                     ),
-                  );
-                },
-              );
+                  ),
+                );
+              }
+              try {
+                Map map = snapshot.data!.snapshot.value as Map;
+                List messages = map.values.toList();
+                messages.sort((a, b) {
+                  int timeA = (a['time'] ?? 0) is int ? a['time'] : 0;
+                  int timeB = (b['time'] ?? 0) is int ? b['time'] : 0;
+                  return timeA.compareTo(timeB);
+                });
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.pink[800],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          messages[index]['text'] ?? '',
+                          style: const TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              } catch (e) {
+                return const Center(
+                  child: Text(
+                    'Pehla message bhejein aur chat shuru karein!',
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                  ),
+                );
+              }
             },
           ),
         ),
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           color: const Color(0xFF2D0C1F),
           child: Row(
             children: [
@@ -163,7 +189,7 @@ class _ChatTabState extends State<ChatTab> {
                     hintText: 'Yahan apna message likhein...',
                     hintStyle: TextStyle(color: Colors.white54),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
                 ),
               ),
@@ -437,7 +463,7 @@ class _TruthOrDareTabState extends State<TruthOrDareTab> {
     "Partner ke sath floor par let kar ek chadar bichakar wahan poori tarah nange hokar let jana.",
     "Partner ke hotho par apne daant se halka sa bite karke unhe apne kareeb khinchna.",
     "Partner ki peeth par upar se niche tak apne nakhunon se soft scratching karte hue chalna.",
-    "Partner ke sath ek-dusre ki upar let kar bina kapdo ke body temperature ko feel karna.",
+    "Partner ke sath ek-dusre ke upar let kar bina kapdo ke body temperature ko feel karna.",
     "Partner ke pet ke nichle hisse par apne garam hoth rakh kar 2 minute tak bina hile rehna.",
     "Partner ke lund ya chut ko apne dono hathon se pakad kar zor se squeeze karna.",
     "Partner ke saamne ek sexy walk karke aana aur unke god mein aakar baith jana.",
