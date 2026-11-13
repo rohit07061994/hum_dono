@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// 1. Real-time Firebase Chat Tab
+// 1. Real-time Firebase Chat Tab (Fixed Timestamp & Sync)
 class ChatTab extends StatefulWidget {
   const ChatTab({super.key});
 
@@ -101,7 +101,7 @@ class _ChatTabState extends State<ChatTab> {
     if (_controller.text.trim().isEmpty) return;
     _chatRef.push().set({
       'text': _controller.text.trim(),
-      'time': ServerValue.timestamp,
+      'time': DateTime.now().millisecondsSinceEpoch, // Safe local numeric timestamp
     });
     _controller.clear();
   }
@@ -119,7 +119,11 @@ class _ChatTabState extends State<ChatTab> {
               }
               Map map = snapshot.data!.snapshot.value as Map;
               List messages = map.values.toList();
-              messages.sort((a, b) => a['time'].compareTo(b['time']));
+              messages.sort((a, b) {
+                int timeA = (a['time'] ?? 0) is int ? a['time'] : 0;
+                int timeB = (b['time'] ?? 0) is int ? b['time'] : 0;
+                return timeA.compareTo(timeB);
+              });
 
               return ListView.builder(
                 padding: const EdgeInsets.all(16),
@@ -262,7 +266,7 @@ class _TruthOrDareTabState extends State<TruthOrDareTab> {
     "Mera kaun sa message padh kar aapke chehre par sabse badi muskaan aati hai?",
     "Agar hum dono ek romantic movie dekh rahe hon, toh aap kis scene par sabse zyada khoye rahenge?",
     "Aapko mere sath barish mein bheegna kaisa lagta hai?",
-    "Mere kis nickname से aapko sabse zyada pyaar hai?",
+    "Mere kis nickname se aapko sabse zyada pyaar hai?",
     "Kya aapko mera haath pakad kar chalna pasand hai?",
     "Agar main aapse kahoon ki abhi sab kuch chhod kar mere paas aa jao, toh aap kya karoge?",
     "Mere sath bitaya gaya sabse funny ya mazakiya moment kaun sa tha?",
@@ -409,7 +413,7 @@ class _TruthOrDareTabState extends State<TruthOrDareTab> {
     "Partner ki chut ke upar apne hoth rakh kar zor se blow karna aur unhe shivering feel karwana.",
     "Partner ke sath bathroom ke mirror ke saamne nange hokar ek-dusre ko gale lagana.",
     "Partner ki kamar ko pakad kar unhe deewar par utha kar (wall pin) kiss karna.",
-    "Partner ke pairo ki ungliyon se lekar jaangho tak apni jeebh से chatte hue upar aana.",
+    "Partner ke pairo ki ungliyon se lekar jaangho tak apni jeebh se chatte hue upar aana.",
     "Partner ke baalon ko muthi mein pakad kar unka chehra apni taraf khinchna aur hotho par kiss karna.",
     "Partner ke saamne bed par let kar apni chut ya lund ko khud apne hathon se rub karna.",
     "Partner ke gale par ek gehra love bite dena jo agle din tak nazar aaye.",
@@ -426,7 +430,7 @@ class _TruthOrDareTabState extends State<TruthOrDareTab> {
     "Partner ke buttocks ke beech mein apni jeebh ghumana aur wahan soft kisses dena.",
     "Partner ke lund ki supari par apne saliva (thook) ko laga kar halka sa suck karna.",
     "Partner ki chut ke andar apni ungli daal kar check karna ki woh kitni geeli (wet) ho chuki hai.",
-    "Partner ke sath floor par ek chadar bichakar wahan poori tarah nange hokar let jana.",
+    "Partner ke sath floor par let kar ek chadar bichakar wahan poori tarah nange hokar let jana.",
     "Partner ke hotho par apne daant se halka sa bite karke unhe apne kareeb khinchna.",
     "Partner ki peeth par upar se niche tak apne nakhunon se soft scratching karte hue chalna.",
     "Partner ke sath ek-dusre ke upar let kar bina kapdo ke body temperature ko feel karna.",
