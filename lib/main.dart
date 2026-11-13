@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// 1. Real-time Firebase Chat Tab (Fixed Timestamp & Sync)
+// 1. Real-time Firebase Chat Tab (Fixed Timestamp & Sync to prevent messages disappearing)
 class ChatTab extends StatefulWidget {
   const ChatTab({super.key});
 
@@ -101,7 +101,7 @@ class _ChatTabState extends State<ChatTab> {
     if (_controller.text.trim().isEmpty) return;
     _chatRef.push().set({
       'text': _controller.text.trim(),
-      'time': DateTime.now().millisecondsSinceEpoch, // Safe local numeric timestamp
+      'time': DateTime.now().millisecondsSinceEpoch,
     });
     _controller.clear();
   }
