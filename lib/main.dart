@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp();
-  } catch (e) {
-    // Ignore if already initialized
-  }
   runApp(const HumDonoApp());
 }
 
@@ -89,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// 1. Cloud Firestore Chat Tab
+// 1. Local Chat Tab
 class ChatTab extends StatefulWidget {
   const ChatTab({super.key});
 
@@ -99,21 +92,16 @@ class ChatTab extends StatefulWidget {
 
 class _ChatTabState extends State<ChatTab> {
   final TextEditingController _controller = TextEditingController();
-  final CollectionReference _chatRef = FirebaseFirestore.instance.collection('chats');
+  final List<String> _messages = [
+    '💕 Yahan apni sweet baatein shuru karein!',
+  ];
 
-  void _sendMessage() async {
+  void _sendMessage() {
     if (_controller.text.trim().isEmpty) return;
-    String textToSend = _controller.text.trim();
-    _controller.clear();
-    try {
-      await _chatRef.add({
-        'text': textToSend,
-        'time': FieldValue.serverTimestamp(),
-        'localTime': DateTime.now().millisecondsSinceEpoch,
-      });
-    } catch (e) {
-      // Handle error
-    }
+    setState(() {
+      _messages.add(_controller.text.trim());
+      _controller.clear();
+    });
   }
 
   @override
@@ -121,50 +109,24 @@ class _ChatTabState extends State<ChatTab> {
     return Column(
       children: [
         Expanded(
-          child: StreamBuilder<QuerySnapshot>(
-            stream: _chatRef.orderBy('localTime', descending: false).snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(color: Colors.pinkAccent),
-                );
-              }
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(24.0),
-                    child: Text(
-                      '💕 Yahan apni sweet baatein shuru karein! Pehla message bhejein.',
-                      style: TextStyle(color: Colors.white70, fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: _messages.length,
+            itemBuilder: (context, index) {
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.pink[800],
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                );
-              }
-
-              final docs = snapshot.data!.docs;
-
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: docs.length,
-                itemBuilder: (context, index) {
-                  final data = docs[index].data() as Map<String, dynamic>;
-                  return Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.pink[800],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        data['text'] ?? '',
-                        style: const TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                    ),
-                  );
-                },
+                  child: Text(
+                    _messages[index],
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
               );
             },
           ),
@@ -252,7 +214,7 @@ class GamesTab extends StatelessWidget {
   }
 }
 
-// 3. Truth or Dare Tab (Poori Spicy List ke sath)
+// 3. Truth or Dare Tab (Poori 100-item Spicy List)
 class TruthOrDareTab extends StatefulWidget {
   const TruthOrDareTab({super.key});
 
@@ -396,7 +358,7 @@ class _TruthOrDareTabState extends State<TruthOrDareTab> {
     "Partner ke haath ki ungliyon ko ek-ek karke apne muh mein lekar chusna.",
     "Partner ke sath mirror ke samne khade hokar apni body ko ek baar dhyan se dekhna.",
     "Partner ke lund ya chut ke aas-pass apni garam saansein chhodna bina touch kiye kuch der tak.",
-    "Partner ke sath floor par let kar ek-dusre ki body ko poori tarah explore karna.",
+    "Partner ke sath floor par let kar ek-dusre ki body poori tarah explore karna.",
     "Partner ke pairo ki ungliyon (toes) ko ek-ek karke pyaar karna.",
     "Partner ki poori baah (arm) par shoulder se lekar ungliyon tak kiss karna.",
     "Partner ke hotho par chocolate ya honey lagakar use apni jeebh se chat kar saaf karna.",
