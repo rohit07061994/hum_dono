@@ -5,7 +5,11 @@ import 'package:firebase_database/firebase_database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    // Ignore if already initialized
+  }
   runApp(const HumDonoApp());
 }
 
@@ -138,7 +142,7 @@ class _ChatTabState extends State<ChatTab> {
                         color: Colors.pink[800],
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text(messages[index]['text'], style: const TextStyle(fontSize: 16, color: Colors.white)),
+                      child: Text(messages[index]['text'] ?? '', style: const TextStyle(fontSize: 16, color: Colors.white)),
                     ),
                   );
                 },
@@ -433,7 +437,7 @@ class _TruthOrDareTabState extends State<TruthOrDareTab> {
     "Partner ke sath floor par let kar ek chadar bichakar wahan poori tarah nange hokar let jana.",
     "Partner ke hotho par apne daant se halka sa bite karke unhe apne kareeb khinchna.",
     "Partner ki peeth par upar se niche tak apne nakhunon se soft scratching karte hue chalna.",
-    "Partner ke sath ek-dusre ke upar let kar bina kapdo ke body temperature ko feel karna.",
+    "Partner ke sath ek-dusre ki upar let kar bina kapdo ke body temperature ko feel karna.",
     "Partner ke pet ke nichle hisse par apne garam hoth rakh kar 2 minute tak bina hile rehna.",
     "Partner ke lund ya chut ko apne dono hathon se pakad kar zor se squeeze karna.",
     "Partner ke saamne ek sexy walk karke aana aur unke god mein aakar baith jana.",
